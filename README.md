@@ -144,15 +144,183 @@ chmod +x scripts/setup-all.sh
 - **n8n**: http://localhost:5678
 - **n8n-mcp**: http://localhost:3000
 
-## 📚 Detailed Setup
+## 📚 Complete Installation Guide
 
-For step-by-step instructions, see our detailed guides in the [`docs/`](docs/) directory:
+### Step 1: Install MongoDB
 
-1. [Prerequisites Setup](docs/01-prerequisites.md)
-2. [LibreChat Installation](docs/02-librechat-setup.md)
-3. [n8n Setup](docs/03-n8n-setup.md)
-4. [MCP Integration](docs/04-mcp-integration.md)
-5. [LM Studio Connection](docs/05-lm-studio-connection.md)
+**macOS (Homebrew)**
+```bash
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb-community
+```
+
+**Linux (Ubuntu/Debian)**
+```bash
+wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+
+**Verify MongoDB is running**
+```bash
+mongosh --eval "db.version()"
+```
+
+### Step 2: Install n8n
+
+**Using npm (recommended)**
+```bash
+npm install -g n8n
+```
+
+**Start n8n**
+```bash
+n8n start
+```
+
+n8n will be available at [http://localhost:5678](http://localhost:5678)
+
+**Configure n8n**
+1. Open http://localhost:5678 in your browser
+2. Create your admin account
+3. Go to Settings > API
+4. Click "Create API Key"
+5. Save the API key (you'll need it later)
+
+### Step 3: Install LibreChat
+
+**Clone and setup LibreChat**
+```bash
+git clone https://github.com/danny-avila/LibreChat.git
+cd LibreChat
+npm ci
+```
+
+**Configure environment**
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add:
+```bash
+MONGO_URI=mongodb://localhost:27017/LibreChat
+OPENAI_API_KEY=your-openai-api-key-here
+```
+
+**Build frontend**
+```bash
+npm run frontend
+```
+
+### Step 4: Install n8n-mcp Server
+
+**Clone and setup n8n-mcp**
+```bash
+cd ~/Documents/GitHub
+git clone https://github.com/czlonkowski/n8n-mcp.git
+cd n8n-mcp
+npm install
+npm run build
+```
+
+**Start n8n-mcp with n8n API integration**
+```bash
+N8N_API_URL=http://localhost:5678/api/v1 \
+N8N_API_KEY="your-n8n-api-key-here" \
+MCP_MODE=http \
+USE_FIXED_HTTP=true \
+PORT=3000 \
+HOST=0.0.0.0 \
+AUTH_TOKEN=librechat-n8n-secure-token-2025 \
+npm run start:http:fixed
+```
+
+The server should show "42 tools available" (24 documentation + 18 workflow management tools).
+
+### Step 5: Configure LibreChat MCP Integration
+
+**Edit LibreChat configuration**
+```bash
+cd LibreChat
+nano librechat.yaml
+```
+
+**Add MCP server configuration**
+```yaml
+mcpServers:
+  n8n:
+    type: streamable-http
+    url: http://localhost:3000/mcp
+    timeout: 60000
+    headers:
+      Authorization: "Bearer librechat-n8n-secure-token-2025"
+```
+
+### Step 6: Install and Configure LM Studio (Optional)
+
+**Download LM Studio**
+1. Visit [https://lmstudio.ai/](https://lmstudio.ai/)
+2. Download for your OS (macOS, Windows, Linux)
+3. Install and launch LM Studio
+
+**Load a model**
+1. Go to "Search" tab
+2. Download a model (e.g., "llama-3.2-3b-instruct")
+3. Go to "Local Server" tab
+4. Click "Start Server" (default port: 1234)
+
+**Add LM Studio to LibreChat**
+
+Edit `librechat.yaml`:
+```yaml
+endpoints:
+  custom:
+    - name: 'LM Studio'
+      apiKey: 'lm-studio'
+      baseURL: 'http://localhost:1234/v1'  # or your LM Studio IP
+      models:
+        default: ['local-model']
+        fetch: true
+      titleConvo: true
+      titleModel: 'local-model'
+      modelDisplayLabel: 'LM Studio'
+      iconURL: 'https://lmstudio.ai/favicon.ico'
+```
+
+### Step 7: Start LibreChat Backend
+
+```bash
+cd LibreChat
+npm run backend
+```
+
+LibreChat backend should start successfully without errors.
+
+### Step 8: Access LibreChat
+
+Open [http://localhost:3080](http://localhost:3080) in your browser.
+
+**Verify integration**
+1. Create an account or login
+2. Start a new chat
+3. Look for the tools icon - you should see 42 n8n tools available
+4. Check endpoints - you should see "LM Studio" as an option (if configured)
+
+### Services Summary
+
+After complete setup, you should have:
+
+| Service | Port | URL |
+|---------|------|-----|
+| LibreChat | 3080 | http://localhost:3080 |
+| n8n | 5678 | http://localhost:5678 |
+| n8n-mcp | 3000 | http://localhost:3000/mcp |
+| LM Studio | 1234 | http://localhost:1234 |
+| MongoDB | 27017 | mongodb://localhost:27017 |
 
 ## ⚙️ Configuration
 
