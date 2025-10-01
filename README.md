@@ -288,9 +288,4 @@ If this project helped you, please consider giving it a ⭐ on GitHub!
 
 ## 📞 Contact
 
-- Project Issues: [GitHub Issues](https://github.com/VOTRE-USERNAME/librechat-n8n-mcp-stack/issues)
-- Discussions: [GitHub Discussions](https://github.com/VOTRE-USERNAME/librechat-n8n-mcp-stack/discussions)
-
----
-
-**Made with ❤️ by the Open Source Community**
+Project Issues: [GitHub Issues](https://github.com/zach0028/librechat-n8n-mcp-stack/issues)
