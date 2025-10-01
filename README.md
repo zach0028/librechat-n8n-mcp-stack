@@ -125,24 +125,53 @@ The result? A powerful AI platform where you can:
 - **Storage**: 10GB+ free space
 - **Network**: For initial setup and AI model downloads
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Automated Installation)
 
-### 1. Clone this repository
+Install the entire stack with a single command:
+
 ```bash
-git clone https://github.com/VOTRE-USERNAME/librechat-n8n-mcp-stack.git
+curl -fsSL https://raw.githubusercontent.com/zach0028/librechat-n8n-mcp-stack/main/install.sh | bash
+```
+
+Or manually:
+
+```bash
+git clone https://github.com/zach0028/librechat-n8n-mcp-stack.git
 cd librechat-n8n-mcp-stack
+chmod +x install.sh
+./install.sh
 ```
 
-### 2. Run the automated setup script
-```bash
-chmod +x scripts/setup-all.sh
-./scripts/setup-all.sh
-```
+The installer will:
+- Detect your OS (macOS/Linux)
+- Install MongoDB
+- Install n8n globally
+- Clone and setup LibreChat
+- Clone and setup n8n-mcp server
+- Generate secure authentication tokens
+- Create all configuration files
+- Build LibreChat frontend
 
-### 3. Access the services
-- **LibreChat**: http://localhost:3080
-- **n8n**: http://localhost:5678
-- **n8n-mcp**: http://localhost:3000
+After installation completes:
+
+1. Start n8n and create an API key:
+   ```bash
+   n8n start
+   ```
+   Open http://localhost:5678, go to Settings > API, create key
+
+2. Set your n8n API key:
+   ```bash
+   export N8N_API_KEY='your-api-key-here'
+   ```
+
+3. Start all services:
+   ```bash
+   cd ~/librechat-stack
+   ./start-all.sh
+   ```
+
+4. Access LibreChat at http://localhost:3080
 
 ## 📚 Complete Installation Guide
 
